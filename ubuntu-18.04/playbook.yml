@@ -30,7 +30,7 @@
 
     - name: Install LEMP Packages
       yum: name={{ item }} update_cache=yes state=latest
-      loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'php-fpm', 'php-mysql' ]
+      loop: [ 'nginx', 'mysql-server', 'php-fpm', 'php-mysqlnd' ]
       tags: [ system ]
       when: 
         - ansible_os_family == "CentOS"    
