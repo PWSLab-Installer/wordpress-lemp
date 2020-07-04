@@ -12,42 +12,16 @@
     - name: Install prerequisites
       apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
       tags: [ system ]
-      when: 
-        - ansible_os_family == "Debian"
-
-    # - name: Install prerequisites
-    #   yum: name=aptitude update_cache=yes state=latest 
-    #   tags: [ system ]
-    #   when: 
-    #     - ansible_os_family == "CentOS"
 
     - name: Install LEMP Packages
       apt: name={{ item }} update_cache=yes state=latest
       loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'php-fpm', 'php-mysql' ]
       tags: [ system ]
-      when: 
-        - ansible_os_family == "Debian"
-
-    - name: Install LEMP Packages
-      yum: name={{ item }} update_cache=yes state=latest
-      loop: [ 'nginx', 'mysql-server', 'php-fpm', 'php-mysqlnd' ]
-      tags: [ system ]
-      when: 
-        - ansible_os_family == "CentOS"    
 
     - name: Install PHP Extensions
       apt: name={{ item }} update_cache=yes state=latest
       loop: "{{ php_modules }}"
       tags: [ system ]
-      when: 
-        - ansible_os_family == "Debian"
-    
-    - name: Install PHP Extensions
-      yum: name={{ item }} update_cache=yes state=latest
-      loop: "{{ php_modules }}"
-      tags: [ system ]
-      when: 
-        - ansible_os_family == "CentOS"
 
   # Nginx Configuration
     - name: Sets Nginx conf file
