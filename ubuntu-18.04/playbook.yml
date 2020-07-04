@@ -15,11 +15,11 @@
       when: 
         - ansible_os_family == "Debian"
 
-    - name: Install prerequisites
-      yum: name=aptitude update_cache=yes state=latest 
-      tags: [ system ]
-      when: 
-        - ansible_os_family == "CentOS"
+    # - name: Install prerequisites
+    #   yum: name=aptitude update_cache=yes state=latest 
+    #   tags: [ system ]
+    #   when: 
+    #     - ansible_os_family == "CentOS"
 
     - name: Install LEMP Packages
       apt: name={{ item }} update_cache=yes state=latest
