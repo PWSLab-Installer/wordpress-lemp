@@ -3,17 +3,23 @@
 #########################################################
 ---
 - name: Install prerequisites
+  hosts: localhost
+  connection: local
   become: yes
   apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
   tags: [ system ]
 
 - name: Install LEMP Packages
+  hosts: localhost
+  connection: local
   become: yes
   apt: name={{ item }} update_cache=yes state=latest
   loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'php-fpm', 'php-mysql' ]
   tags: [ system ]
 
 - name: Install PHP Extensions
+  hosts: localhost
+  connection: local
   become: yes
   apt: name={{ item }} update_cache=yes state=latest
   loop: "{{ php_modules }}"
@@ -21,12 +27,16 @@
 
 # Nginx Configuration
 - name: Sets Nginx conf file
+  hosts: localhost
+  connection: local
   become: yes
   template:
     src: "nginx.conf.j2"
     dest: "/etc/nginx/sites-available/{{ http_conf }}"
 
 - name: Enables new site
+  hosts: localhost
+  connection: local
   become: yes
   file:
     src: "/etc/nginx/sites-available/{{ http_conf }}"
@@ -35,6 +45,8 @@
   notify: Reload Nginx
 
 - name: Removes "default" site
+  hosts: localhost
+  connection: local
   become: yes
   file:
     path: "/etc/nginx/sites-enabled/default"
@@ -49,6 +61,8 @@
 #   register: db_user
 
 - name: Set the root password
+  hosts: localhost
+  connection: local
   become: yes
   mysql_user:
     name: root
@@ -79,6 +93,8 @@
 #   tags: [ mysql ]
 
 - name: Creates database for WordPress
+  hosts: localhost
+  connection: local
   become: yes
   mysql_db:
     name: "{{ mysql_db }}"
