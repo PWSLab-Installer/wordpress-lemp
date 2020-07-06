@@ -10,8 +10,9 @@
     - name: Fetch WordPress Lemp Role
       git:
         repo: https://ro:uREXa6AXL22sDdiqbUUV@pwslab.org/ansible/wordpress-lemp.git
-        dest: /root/.ansible/roles
+        dest: /root/.ansible/roles/wlemp
         version: master
+        force: yes
 
     - name: Check if version of Ubuntu
       shell: |
@@ -21,7 +22,7 @@
 
     - name: Update php Version 
       lineinfile:
-          dest: ~/.ansible/roles/wordpress-lemp/templates/nginx.conf.j2
+          dest: ~/.ansible/roles/wlemp/templates/nginx.conf.j2
           regexp: '^                fastcgi_pass unix:'
           line: 'fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;'
           state: present
@@ -30,4 +31,4 @@
 
     - name: Installing LEMP WORDPRESS
       include_role:
-        name: wordpress-lemp
+        name: wlemp
