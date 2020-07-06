@@ -2,12 +2,6 @@
 # DO Community Playbooks: Wordpress on Ubuntu 18.04 LAMP
 #########################################################
 ---
-- hosts: all
-  become: true
-  # vars_files:
-  #   - vars/default.yml
-
-  tasks:
     - name: Install prerequisites
       apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
       tags: [ system ]
@@ -139,13 +133,13 @@
         dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
       tags: [ wordpress ]
 
-  handlers:
-    - name: Reload Nginx
-      service:
-        name: nginx
-        state: reloaded
+      handlers:
+          - name: Reload Nginx
+            service:
+              name: nginx
+              state: reloaded
 
-    - name: Restart Nginx
-      service:
-        name: nginx
-        state: restarted
+          - name: Restart Nginx
+            service:
+              name: nginx
+              state: restarted
