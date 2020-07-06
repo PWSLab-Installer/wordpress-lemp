@@ -5,8 +5,8 @@
 - hosts: localhost
   connection: local
   become: true
-  vars_files:
-    - vars/default.yml
+  # vars_files:
+  #   - vars/default.yml
 
   tasks:
     - name: Install prerequisites
@@ -26,7 +26,7 @@
   # Nginx Configuration
     - name: Sets Nginx conf file
       template:
-        src: "files/nginx.conf.j2"
+        src: "nginx.conf.j2"
         dest: "/etc/nginx/sites-available/{{ http_conf }}"
 
     - name: Enables new site
@@ -43,6 +43,12 @@
       notify: Reload Nginx
 
   # MySQL Configuration
+    # - name: Ensure no user named 'sally' exists at all
+    #   mysql_user:
+    #     name: root
+    #     state: present
+    #   register: db_user
+
     - name: Set the root password
       mysql_user:
         name: root
@@ -130,7 +136,7 @@
 
     - name: Set up wp-config
       template:
-        src: "files/wp-config.php.j2"
+        src: "wp-config.php.j2"
         dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
       tags: [ wordpress ]
 

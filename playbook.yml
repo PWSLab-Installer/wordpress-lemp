@@ -1,0 +1,33 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    pip_install_packages:
+      - php_version: docker
+
+  tasks:
+      
+    - name: Fetch WordPress Lemp Role
+      git:
+        repo: https://ro:uREXa6AXL22sDdiqbUUV@pwslab.org/ansible/wordpress-lemp.git
+        dest: /root/.ansible/roles
+        version: master
+
+    - name: Check if version of Ubuntu
+      shell: |
+        lsb_release -d
+      register: ubuntu_os
+      ignore_errors: yes
+
+    - name: Update php Version 
+      lineinfile:
+          dest: ~/.ansible/roles/wordpress-lemp/templates/nginx.conf.j2
+          regexp: '^                fastcgi_pass unix:'
+          line: 'fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;'
+          state: present
+      when:
+        - ubuntu_os.stdout | regex_search("20.04")
+
+    - name: Installing LEMP WORDPRESS
+      include_role:
+        name: wordpress-lemp
