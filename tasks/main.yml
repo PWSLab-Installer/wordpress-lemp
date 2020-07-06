@@ -3,31 +3,31 @@
 #########################################################
 ---
 - name: Install prerequisites
-  become: yes
+  become: true
   apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
   tags: [ system ]
 
 - name: Install LEMP Packages
-  become: yes
+  become: true
   apt: name={{ item }} update_cache=yes state=latest
   loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'php-fpm', 'php-mysql' ]
   tags: [ system ]
 
 - name: Install PHP Extensions
-  become: yes
+  become: true
   apt: name={{ item }} update_cache=yes state=latest
   loop: "{{ php_modules }}"
   tags: [ system ]
 
 # Nginx Configuration
 - name: Sets Nginx conf file
-  become: yes
+  become: true
   template:
     src: "nginx.conf.j2"
     dest: "/etc/nginx/sites-available/{{ http_conf }}"
 
 - name: Enables new site
-  become: yes
+  become: true
   file:
     src: "/etc/nginx/sites-available/{{ http_conf }}"
     dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
@@ -35,7 +35,7 @@
   notify: Reload Nginx
 
 - name: Removes "default" site
-  become: yes
+  become: true
   file:
     path: "/etc/nginx/sites-enabled/default"
     state: absent
@@ -49,7 +49,7 @@
 #   register: db_user
 
 - name: Set the root password
-  become: yes
+  become: true
   mysql_user:
     name: root
     password: "{{ mysql_root_password }}"
@@ -65,11 +65,11 @@
     dest: /root/.my.cnf
     owner: root
     mode: 0600
-  become: yes
+  become: true
   # notify: Restart MySQL
 
 - name: Remove all anonymous user accounts
-  become: yes
+  become: true
   mysql_user:
     name: ''
     host_all: yes
@@ -79,7 +79,7 @@
   tags: [ mysql ]
 
 - name: Remove the MySQL test database
-  become: yes
+  become: true
   mysql_db:
     name: test
     state: absent
@@ -88,7 +88,7 @@
   tags: [ mysql ]
 
 - name: Creates database for WordPress
-  become: yes
+  become: true
   mysql_db:
     name: "{{ mysql_db }}"
     state: present
@@ -97,7 +97,7 @@
   tags: [ mysql ]
 
 - name: Create MySQL user for WordPress
-  become: yes
+  become: true
   mysql_user:
     name: "{{ mysql_user }}"
     password: "{{ mysql_password }}"
@@ -109,7 +109,7 @@
 
 # UFW Configuration
 - name: "UFW - Allow HTTP on port {{ http_port }}"
-  become: yes
+  become: true
   ufw:
     rule: allow
     port: "{{ http_port }}"
@@ -118,14 +118,14 @@
 
 # WordPress Configuration
 - name: Create the pwslab directory if it does not exist
-  become: yes
+  become: true
   file:
     path: /var/www/{{ http_host }}
     state: directory
     mode: '0755'
     
 - name: Download and unpack latest WordPress
-  become: yes
+  become: true
   unarchive:
     src: https://wordpress.org/latest.tar.gz
     dest: "/var/www/{{ http_host }}"
@@ -134,7 +134,7 @@
   tags: [ wordpress ]
 
 - name: Set ownership
-  become: yes
+  become: true
   file:
     path: "/var/www/{{ http_host }}"
     state: directory
@@ -144,17 +144,17 @@
   tags: [ wordpress ]
 
 - name: Set permissions for directories
-  become: yes
+  become: true
   shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
   tags: [ wordpress ]
 
 - name: Set permissions for files
-  become: yes
+  become: true
   shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
   tags: [ wordpress ]
 
 - name: Set up wp-config
-  become: yes
+  become: true
   template:
     src: "wp-config.php.j2"
     dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
