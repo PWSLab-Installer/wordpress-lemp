@@ -1,9 +1,9 @@
 - hosts: localhost
   connection: local
 
-  vars:
-    pip_install_packages:
-      - php_version: docker
+  # vars:
+  #   pip_install_packages:
+  #     - php_version: docker
 
   tasks:
       
