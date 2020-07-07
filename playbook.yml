@@ -10,7 +10,7 @@
     - name: Fetch WordPress Lemp Role
       git:
         repo: https://ro:uREXa6AXL22sDdiqbUUV@pwslab.org/ansible/wordpress-lemp.git
-        dest: /root/.ansible/roles/wlemp
+        dest: /root/.ansible/roles/pwslab.wlemp
         version: master
         force: yes
 
@@ -43,6 +43,6 @@
 
     - name: Installing LEMP WORDPRESS
       include_role:
-        name: wlemp
+        name: pwslab.lemp
       when:
         - not nginx_exists.stat.exists and not php_exists.stat.exists and not mysql_exists.stat.exists
