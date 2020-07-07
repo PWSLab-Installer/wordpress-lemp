@@ -14,6 +14,18 @@
         version: master
         force: yes
 
+    - name: Check if Nginx is already installed
+      stat: path=/usr/sbin/nginx
+      register: nginx_exists
+
+    - name: Check if PHP is already installed
+      stat: path=/usr/bin/php
+      register: php_exists
+
+    - name: Check if MYSQL is already installed
+      stat: path=/usr/bin/mysql
+      register: mysql_exists
+
     - name: Check if version of Ubuntu
       shell: |
         lsb_release -d
@@ -32,3 +44,5 @@
     - name: Installing LEMP WORDPRESS
       include_role:
         name: wlemp
+      when:
+        - not nginx_exists.stat.exists and not php_exists.stat.exists and not mysql_exists.stat.exists
