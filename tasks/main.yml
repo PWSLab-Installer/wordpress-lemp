@@ -9,7 +9,7 @@
 
 - name: Install LEMP Packages
   become: true
-  apt: name=php-mysqlnd state=present
+  yum: name=php-mysqlnd state=present
   when:
     - cent_os.stdout | regex_search("CentOS")
 
