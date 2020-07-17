@@ -230,6 +230,17 @@
   template:
     src: "wp-config.php.j2"
     dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
+  notify: 
+    - Restart Nginx
+    - Restart PHP-FPM
   tags: [ wordpress ]
+
+- name: Create the pwslab-wordpress directory if it does not exist
+  become: true
+  file:
+    path: /var/www/{{ http_host }}
+    state: directory
+    recurse: yes
+    mode: '0777'
 
   

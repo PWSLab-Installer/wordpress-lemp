@@ -60,6 +60,11 @@
       when: not php_exists.stat.exists
       ignore_errors: yes
 
+    - name: Applying role REMI
+      command: mv ~/.ansible/roles/geerlingguy.repo-remi  ~/.ansible/roles/pwslab.repo-remi 
+      when: not php_exists.stat.exists
+      ignore_errors: yes
+
     - name: Applying role MYSQL
       command: mv ~/.ansible/roles/geerlingguy.mysql ~/.ansible/roles/pwslab.mysql
       when: not mysql_exists.stat.exists
@@ -84,6 +89,42 @@
           state: present
       when:
         - cent_os.stdout | regex_search("CentOS")
+    
+    - name: Applying replacement on Ubuntu
+      lineinfile:
+          dest: ~/.ansible/roles/pwslab.php/vars/Debian.yml
+          regexp: '^__php_webserver_daemon: '
+          line: '__php_webserver_daemon: "nginx"'
+          state: present
+      when:
+        - ubuntu_os.stdout | regex_search("Ubuntu")
+
+    - name: Installing NGINX
+      include_role:
+        name: pwslab.nginx
+      when: not nginx_exists.stat.exists
+    
+    - name: Installing MYSQL
+      include_role:
+          name: pwslab.mysql
+      when: not mysql_exists.stat.exists
+
+    - name: Installing Remi
+      include_role:
+          name: pwslab.repo-remi 
+      when: cent_os.stdout | regex_search("CentOS")
+
+    - name: Installing PHP-Versions
+      include_role:
+          name: pwslab.php-versions
+      when: 
+        - not php_exists.stat.exists
+        - not cent_os.stdout | regex_search("CentOS Linux release 8")
+
+    - name: Installing PHP
+      include_role:
+          name: pwslab.php
+      when: not php_exists.stat.exists
 
     - name: Applying replacement on CentOS
       lineinfile:
@@ -120,43 +161,6 @@
           state: present
       when:
         - cent_os.stdout | regex_search("CentOS Linux release 7")
-    
-    - name: Applying replacement on Ubuntu
-      lineinfile:
-          dest: ~/.ansible/roles/pwslab.php/vars/Debian.yml
-          regexp: '^__php_webserver_daemon: '
-          line: '__php_webserver_daemon: "nginx"'
-          state: present
-      when:
-        - ubuntu_os.stdout | regex_search("Ubuntu")
-
-    - name: Installing NGINX
-      include_role:
-        name: pwslab.nginx
-      when: not nginx_exists.stat.exists
-    
-    - name: Installing MYSQL
-      include_role:
-          name: pwslab.mysql
-      when: not mysql_exists.stat.exists
-
-    - name: Installing MYSQL
-      include_role:
-          name: geerlingguy.repo-remi 
-      # when: not mysql_exists.stat.exists
-
-    - name: Installing PHP-Versions
-      include_role:
-          name: pwslab.php-versions
-      when: 
-        - not php_exists.stat.exists
-        - not cent_os.stdout | regex_search("CentOS Linux release 8")
-
-    - name: Installing PHP
-      include_role:
-          name: pwslab.php
-      when: not php_exists.stat.exists
-
 
     - name: Update php Version 
       lineinfile:
