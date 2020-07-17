@@ -25,6 +25,16 @@
   template:
     src: "nginx.conf.j2"
     dest: "/etc/nginx/sites-available/{{ http_conf }}"
+  when:
+        - cent_os.stdout | regex_search("Ubuntu")
+
+- name: Sets Nginx conf file
+  become: true
+  template:
+    src: "nginx.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ http_conf }}"
+  when:
+        - cent_os.stdout | regex_search("CentOS")
 
 - name: Enables new site
   become: true
@@ -33,6 +43,8 @@
     dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
     state: link
   notify: Reload Nginx
+  when:
+    - cent_os.stdout | regex_search("Ubuntu")
 
 - name: Removes "default" site
   become: true
@@ -40,6 +52,8 @@
     path: "/etc/nginx/sites-enabled/default"
     state: absent
   notify: Reload Nginx
+  when:
+    - cent_os.stdout | regex_search("Ubuntu")
 
 # MySQL Configuration
 # - name: Ensure no user named 'sally' exists at all

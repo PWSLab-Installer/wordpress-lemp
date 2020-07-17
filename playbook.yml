@@ -120,15 +120,15 @@
 
     - name: Update php Version 
       lineinfile:
-          dest: ~/.ansible/roles/wlemp/templates/nginx.conf.j2
+          dest: ~/.ansible/roles/pwslab.wlemp/templates/nginx.conf.j2
           regexp: '^                fastcgi_pass unix:'
-          line: 'fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;'
+          line: 'fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;'
           state: present
       when:
         - ubuntu_os.stdout | regex_search("20.04")
 
     - name: Installing LEMP WORDPRESS
       include_role:
-        name: pwslab.lemp
-      when:
-        - not nginx_exists.stat.exists and not php_exists.stat.exists and not mysql_exists.stat.exists
+        name: pwslab.wlemp
+      # when:
+      #   - not nginx_exists.stat.exists and not php_exists.stat.exists and not mysql_exists.stat.exists
