@@ -7,11 +7,6 @@
     php_webserver_daemon: "nginx"
     mysql_databases: 
       - name: wordpress
-    
-    mysql_users:
-      - name: wordpress
-        host: 127.0.0.1
-        password: wordpress
 
   tasks:
       
@@ -126,6 +121,15 @@
           state: present
       when:
         - ubuntu_os.stdout | regex_search("20.04")
+
+    - name: Update php Version 
+      lineinfile:
+          dest: ~/.ansible/roles/pwslab.wlemp/templates/nginx.conf.j2
+          regexp: '^                fastcgi_pass unix:'
+          line: 'fastcgi_pass unix:/var/run/php-fpm/www.sock;'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS")
 
     - name: Installing LEMP WORDPRESS
       include_role:

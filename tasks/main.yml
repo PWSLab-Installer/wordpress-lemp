@@ -9,6 +9,12 @@
 
 - name: Install LEMP Packages
   become: true
+  apt: name=php-mysqlnd state=present
+  when:
+    - cent_os.stdout | regex_search("CentOS")
+
+- name: Install LEMP Packages
+  become: true
   apt: name=php{{ php_version }}-mysql update_cache=yes state=present
   when:
     - ubuntu_os.stdout | regex_search("Ubuntu")
@@ -142,7 +148,7 @@
   file:
     path: /var/www/{{ http_host }}
     state: directory
-    mode: '0755'
+    mode: '0777'
     
 - name: Download and unpack latest WordPress
   become: true
@@ -175,7 +181,7 @@
     group: nginx
   tags: [ wordpress ]
   when:
-    - ubuntu_os.stdout | regex_search("CentOS")
+    - cent_os.stdout | regex_search("CentOS")
 
 - name: Set permissions for directories
   become: true
