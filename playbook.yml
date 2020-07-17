@@ -1,9 +1,17 @@
 - hosts: localhost
   connection: local
 
-  # vars:
-  #   pip_install_packages:
-  #     - php_version: docker
+  vars:
+    php_version: '7.2'
+    php_default_version_debian: '7.2'
+    php_webserver_daemon: "nginx"
+    mysql_databases: 
+      - name: wordpress
+    
+    mysql_users:
+      - name: wordpress
+        host: 127.0.0.1
+        password: wordpress
 
   tasks:
       
@@ -13,6 +21,18 @@
         dest: /root/.ansible/roles/pwslab.wlemp
         version: master
         force: yes
+
+    - name: Install Role NGINX
+      local_action: command ansible-galaxy install -f geerlingguy.nginx 
+
+    - name: Install Role MYSQL
+      local_action: command ansible-galaxy install -f geerlingguy.mysql
+
+    - name: Install Role PHP
+      local_action: command ansible-galaxy install -f geerlingguy.php
+
+    - name: Install Role PHP-VERSIONS
+      local_action: command ansible-galaxy install -f geerlingguy.php-versions
 
     - name: Check if Nginx is already installed
       stat: path=/usr/sbin/nginx
@@ -26,11 +46,77 @@
       stat: path=/usr/bin/mysql
       register: mysql_exists
 
-    - name: Check if version of Ubuntu
+    - name: Applying role Nginx
+      command: mv ~/.ansible/roles/geerlingguy.nginx ~/.ansible/roles/pwslab.nginx
+      when: not nginx_exists.stat.exists
+      ignore_errors: yes
+
+    - name: Applying role PHP
+      command: mv ~/.ansible/roles/geerlingguy.php ~/.ansible/roles/pwslab.php
+      when: not php_exists.stat.exists
+      ignore_errors: yes
+
+    - name: Applying role PHP-Versions
+      command: mv ~/.ansible/roles/geerlingguy.php-versions ~/.ansible/roles/pwslab.php-versions
+      when: not php_exists.stat.exists
+      ignore_errors: yes
+
+    - name: Applying role MYSQL
+      command: mv ~/.ansible/roles/geerlingguy.mysql ~/.ansible/roles/pwslab.mysql
+      when: not mysql_exists.stat.exists
+      ignore_errors: yes
+
+    - name: Check the version of CentOS
+      command: cat /etc/centos-release
+      register: cent_os
+      ignore_errors: yes
+
+    - name: Check the version of Ubuntu
       shell: |
         lsb_release -d
       register: ubuntu_os
       ignore_errors: yes
+
+    - name: Applying replacement on CentOS
+      lineinfile:
+          dest: ~/.ansible/roles/pwslab.php/vars/Debian.yml
+          regexp: '^__php_webserver_daemon: '
+          line: '__php_webserver_daemon: "nginx"'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS")
+    
+    - name: Applying replacement on Ubuntu
+      lineinfile:
+          dest: ~/.ansible/roles/pwslab.php/vars/Debian.yml
+          regexp: '^__php_webserver_daemon: '
+          line: '__php_webserver_daemon: "nginx"'
+          state: present
+      when:
+        - ubuntu_os.stdout | regex_search("Ubuntu")
+
+    - name: Installing NGINX
+      include_role:
+        name: pwslab.nginx
+      when: not nginx_exists.stat.exists
+    
+    - name: Installing MYSQL
+      include_role:
+          name: pwslab.mysql
+      when: not mysql_exists.stat.exists
+
+    - name: Installing PHP-Versions
+      include_role:
+          name: pwslab.php-versions
+      when: 
+        - not php_exists.stat.exists
+        - not cent_os.stdout | regex_search("CentOS Linux release 8")
+
+    - name: Installing PHP
+      include_role:
+          name: pwslab.php
+      when: not php_exists.stat.exists
+
 
     - name: Update php Version 
       lineinfile:
