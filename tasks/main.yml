@@ -44,6 +44,22 @@
   when:
         - cent_os.stdout | regex_search("CentOS")
 
+- name: Create the FASTCGI directory
+  become: true
+  file:
+    path: /etc/nginx/snippets/
+    state: directory
+  when:
+        - cent_os.stdout | regex_search("CentOS")
+
+- name: Sets FASTCGI conf file - CentOS
+  become: true
+  template:
+    src: "fastcgi-centos.conf.j2"
+    dest: "/etc/nginx/snippets/fastcgi-php.conf"
+  when:
+        - cent_os.stdout | regex_search("CentOS")
+
 - name: Enables new site
   become: true
   file:
