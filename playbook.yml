@@ -5,6 +5,7 @@
     php_version: '7.2'
     php_default_version_debian: '7.2'
     php_webserver_daemon: "nginx"
+    php_packages_state: latest
     mysql_databases: 
       - name: wordpress
 
@@ -19,6 +20,9 @@
 
     - name: Install Role NGINX
       local_action: command ansible-galaxy install -f geerlingguy.nginx 
+
+    - name: Install Role REMI
+      local_action: command ansible-galaxy install -f geerlingguy.repo-remi 
 
     - name: Install Role MYSQL
       local_action: command ansible-galaxy install -f geerlingguy.mysql
@@ -80,6 +84,42 @@
           state: present
       when:
         - cent_os.stdout | regex_search("CentOS")
+
+    - name: Applying replacement on CentOS
+      lineinfile:
+          dest: /etc/php-fpm.d/www.conf
+          regexp: '^listen = '
+          line: 'listen = /var/run/php{{ php_version }}-fpm.sock'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS Linux release 7")
+
+    - name: Applying replacement on CentOS
+      lineinfile:
+          dest: /etc/php-fpm.d/www.conf
+          regexp: '^;listen.owner'
+          line: 'listen.owner = nginx'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS Linux release 7")
+
+    - name: Applying replacement on CentOS
+      lineinfile:
+          dest: /etc/php-fpm.d/www.conf
+          regexp: '^;listen.group'
+          line: 'listen.group = nginx'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS Linux release 7")
+
+    - name: Applying replacement on CentOS
+      lineinfile:
+          dest: /etc/php-fpm.d/www.conf
+          regexp: '^;listen.mode'
+          line: 'listen.mode = 0660'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS Linux release 7")
     
     - name: Applying replacement on Ubuntu
       lineinfile:
@@ -99,6 +139,11 @@
       include_role:
           name: pwslab.mysql
       when: not mysql_exists.stat.exists
+
+    - name: Installing MYSQL
+      include_role:
+          name: geerlingguy.repo-remi 
+      # when: not mysql_exists.stat.exists
 
     - name: Installing PHP-Versions
       include_role:
@@ -129,7 +174,16 @@
           line: 'fastcgi_pass unix:/var/run/php-fpm/www.sock;'
           state: present
       when:
-        - cent_os.stdout | regex_search("CentOS")
+        - cent_os.stdout | regex_search("CentOS Linux release 8")
+
+    - name: Update php Version 
+      lineinfile:
+          dest: ~/.ansible/roles/pwslab.wlemp/templates/nginx.conf.j2
+          regexp: '^                fastcgi_pass unix:'
+          line: 'fastcgi_pass unix:/var/run/php{{ php_version }}-fpm.sock;'
+          state: present
+      when:
+        - cent_os.stdout | regex_search("CentOS Linux release 7")
 
     - name: Installing LEMP WORDPRESS
       include_role:

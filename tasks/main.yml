@@ -60,6 +60,21 @@
   when:
         - cent_os.stdout | regex_search("CentOS")
 
+- name: Sets FASTCGI conf file - CentOS
+  become: true
+  template:
+    src: "fastcgi.conf"
+    dest: "/etc/nginx/"
+  when:
+        - cent_os.stdout | regex_search("CentOS")
+
+- name: Remove file (delete file)
+  file:
+    path: /etc/nginx/conf.d/default.conf
+    state: absent
+  when:
+          - cent_os.stdout | regex_search("CentOS")
+
 - name: Enables new site
   become: true
   file:
@@ -164,6 +179,7 @@
   file:
     path: /var/www/{{ http_host }}
     state: directory
+    recurse: yes
     mode: '0777'
     
 - name: Download and unpack latest WordPress
