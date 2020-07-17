@@ -13,6 +13,12 @@
   when:
     - cent_os.stdout | regex_search("CentOS Linux release 8")
 
+- name: Install LEMP Packages
+  become: true
+  yum: name=php-json state=present
+  when:
+    - cent_os.stdout | regex_search("CentOS Linux release 8")
+
 - name: Enable remi 72
   command: yum-config-manager --enable remi-php72
   when:
