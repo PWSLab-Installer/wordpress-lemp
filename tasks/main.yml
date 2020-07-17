@@ -162,6 +162,20 @@
     owner: www-data
     group: www-data
   tags: [ wordpress ]
+  when:
+    - ubuntu_os.stdout | regex_search("Ubuntu")
+
+- name: Set ownership
+  become: true
+  file:
+    path: "/var/www/{{ http_host }}"
+    state: directory
+    recurse: yes
+    owner: nginx
+    group: nginx
+  tags: [ wordpress ]
+  when:
+    - ubuntu_os.stdout | regex_search("CentOS")
 
 - name: Set permissions for directories
   become: true
