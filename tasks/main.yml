@@ -7,11 +7,17 @@
 #   apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
 #   tags: [ system ]
 
-# - name: Install LEMP Packages
-#   become: true
-#   yum: name=php-mysqlnd state=present
-#   when:
-#     - cent_os.stdout | regex_search("CentOS")
+- name: Install LEMP Packages
+  become: true
+  yum: name=php-mysqlnd state=present
+  when:
+    - cent_os.stdout | regex_search("CentOS Linux release 8")
+
+- name: Install LEMP Packages
+  become: true
+  yum: name=php-mysql state=present
+  when:
+    - cent_os.stdout | regex_search("CentOS Linux release 7")
 
 - name: Install LEMP Packages
   become: true

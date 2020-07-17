@@ -24,8 +24,8 @@
     - name: Install Role REMI
       local_action: command ansible-galaxy install -f geerlingguy.repo-remi 
 
-    - name: Install Role PHP-MYSQL
-      local_action: command ansible-galaxy install -f geerlingguy.php-mysql
+    # - name: Install Role PHP-MYSQL
+    #   local_action: command ansible-galaxy install -f geerlingguy.php-mysql
 
     - name: Install Role MYSQL
       local_action: command ansible-galaxy install -f geerlingguy.mysql
@@ -63,10 +63,10 @@
       when: not php_exists.stat.exists
       ignore_errors: yes
 
-    - name: Applying role PHP-MYSQL
-      command: mv ~/.ansible/roles/geerlingguy.php-mysql ~/.ansible/roles/pwslab.php-mysql
-      when: not php_exists.stat.exists
-      ignore_errors: yes
+    # - name: Applying role PHP-MYSQL
+    #   command: mv ~/.ansible/roles/geerlingguy.php-mysql ~/.ansible/roles/pwslab.php-mysql
+    #   when: not php_exists.stat.exists
+    #   ignore_errors: yes
 
     - name: Applying role REMI
       command: mv ~/.ansible/roles/geerlingguy.repo-remi  ~/.ansible/roles/pwslab.repo-remi 
@@ -122,11 +122,6 @@
           name: pwslab.repo-remi 
       when: cent_os.stdout | regex_search("CentOS")
 
-    - name: Installing PHP-MYSQL
-      include_role:
-          name: pwslab.php-mysql
-      when: cent_os.stdout | regex_search("CentOS")
-
     - name: Installing PHP-Versions
       include_role:
           name: pwslab.php-versions
@@ -138,6 +133,11 @@
       include_role:
           name: pwslab.php
       when: not php_exists.stat.exists
+
+    # - name: Installing PHP-MYSQL
+    #   include_role:
+    #       name: pwslab.php-mysql
+    #   when: cent_os.stdout | regex_search("CentOS")
 
     - name: Applying replacement on CentOS
       lineinfile:
