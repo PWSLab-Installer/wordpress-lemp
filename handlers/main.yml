@@ -13,3 +13,4 @@
   service:
     name: php-fpm
     state: restarted
+  when: cent_os.stdout | regex_search("CentOS")
