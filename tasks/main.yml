@@ -20,15 +20,15 @@
 #   tags: [ system ]
 
 # Nginx Configuration
-- name: Sets Nginx conf file
+- name: Sets Nginx conf file - Ubuntu
   become: true
   template:
     src: "nginx.conf.j2"
     dest: "/etc/nginx/sites-available/{{ http_conf }}"
   when:
-        - cent_os.stdout | regex_search("Ubuntu")
+        - ubuntu_os.stdout | regex_search("Ubuntu")
 
-- name: Sets Nginx conf file
+- name: Sets Nginx conf file - CentOS
   become: true
   template:
     src: "nginx.conf.j2"
@@ -44,7 +44,7 @@
     state: link
   notify: Reload Nginx
   when:
-    - cent_os.stdout | regex_search("Ubuntu")
+    - ubuntu_os.stdout | regex_search("Ubuntu")
 
 - name: Removes "default" site
   become: true
@@ -53,7 +53,7 @@
     state: absent
   notify: Reload Nginx
   when:
-    - cent_os.stdout | regex_search("Ubuntu")
+    - ubuntu_os.stdout | regex_search("Ubuntu")
 
 # MySQL Configuration
 # - name: Ensure no user named 'sally' exists at all
