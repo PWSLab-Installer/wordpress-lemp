@@ -7,11 +7,13 @@
 #   apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
 #   tags: [ system ]
 
-# - name: Install LEMP Packages
-#   become: true
-#   apt: name={{ item }} update_cache=yes state=latest
-#   loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'php-fpm', 'php-mysql' ]
-#   tags: [ system ]
+- name: Install LEMP Packages
+  become: true
+  apt: name=php{{ php_version }}-mysql update_cache=yes state=present
+  when:
+    - ubuntu_os.stdout | regex_search("Ubuntu")
+  # loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'php-fpm', 'php-mysql' ]
+  # tags: [ system ]
 
 # - name: Install PHP Extensions
 #   become: true
